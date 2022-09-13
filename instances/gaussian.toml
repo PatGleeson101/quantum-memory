@@ -1,0 +1,8 @@
+simulate="jesse-gaussian"
+
+[arguments]
+pulsewidth=2
+bandwidth=4
+tswitch=8
+
+# Other arguments will be set to default.

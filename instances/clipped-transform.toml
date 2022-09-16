@@ -2,5 +2,5 @@ simulate="gaussian"
 
 [arguments]
 pulsewidth=2
-bandwidth=4
+bandwidth=[1.0,0.5]
 tswitch=8

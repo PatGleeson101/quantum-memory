@@ -1,7 +1,11 @@
 <simulation xmds-version="2">
-  <name>jesse-tophat-long</name>
+  <name>tophat-ondemand</name>
   <author>Patrick Gleeson</author>
-  <description> 1-dimensional 2-level gradient echo memory simulation. Solves the 2-level Maxwell-Bloch equations (as written by Jesse) for an ensemble under a (linear) classical control field and a weak probe. This file implements a tophat pulse.
+  <description> 1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
+
+  This file: tophat input pulse with a linear control field. The control field
+  turns off at toff and is re-activated (but inverted) at trelease. A large integration interval and number of time samples have been set, to allow
+  investigating decay over time.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->
@@ -15,11 +19,14 @@
     //double od;		/*optical depth*/ 
     double omega;		/*control field rabi frequency*/
     double eta;   		/*operator for gradient*/
-    double t_switch; /* Time at which gradient reverses */
+    double t_off; /* Time at which gradient is switched off */
+    double t_release; /* Time at which gradient is reversed */
 
-    real gradientswitch(double time) {
-      if (time < t_switch) {
+    real gradient(double time) {
+      if (time < t_off) {
         return 1.0; 
+      } else if (time < t_release){
+        return 0.0;
       } else {
         return -1.0;
       }
@@ -35,7 +42,8 @@
     ]]>
   </globals>
   <arguments append_args_to_output_filename="no">
-    <argument default_value= "5" name = "tswitch" type = "real" />
+    <argument default_value= "5" name = "toff" type = "real" />
+    <argument default_value= "10" name = "trelease" type = "real" />
     <argument default_value= "1" name = "bandwidth" type = "real" />
     <argument default_value= "5" name = "omega_in" type = "real" />
     <argument default_value= "400" name = "od" type = "real" />
@@ -43,7 +51,8 @@
     <argument default_value= "1.2" name = "pulsewidth" type = "real" />
     <![CDATA[
     omega = 2*pi*omega_in;
-    t_switch = tswitch;
+    t_off = toff;
+    t_release = trelease;
     ]]>
   </arguments>
 </features>
@@ -63,13 +72,13 @@
 </vector>
 
 <sequence>
-  <integrate algorithm="ARK45" interval="50" steps="200" tolerance="1.0e-6">
-  <samples>300</samples>
+  <integrate algorithm="ARK45" interval="150" steps="200" tolerance="1.0e-6">
+  <samples>1200</samples>
   
   <operators>   
     <operator kind="functions">
       <![CDATA[
-      eta = 2*pi*bandwidth * gradientswitch(t);
+      eta = 2*pi*bandwidth * gradient(t);
       ]]>
     </operator>
              
@@ -94,7 +103,7 @@
   </integrate>
 </sequence>
 
-<output filename="jesse-tophat-long" format="hdf5">
+<output filename="tophat-ondemand" format="hdf5">
   <group>
   <sampling basis="z" initial_sample="yes">
     <moments>SR SI ER EI</moments> <!-- Desired output variables-->

@@ -1,6 +1,6 @@
-simulate="jesse-tophat"
+simulate="tophat"
 
 [arguments]
 pulsewidth=2.0
 bandwidth=4
-tswitch=8
+tswitch=[8,20,40]

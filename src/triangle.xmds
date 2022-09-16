@@ -1,0 +1,111 @@
+<simulation xmds-version="2">
+  <name>triangle</name>
+  <author>Patrick Gleeson</author>
+  <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
+
+  This file: asymetric triangle input pulse, with a linear control field that reverses after tswitch.
+  </description>
+<features>
+  <benchmark /> <!-- Each simulation will report its runtime -->
+  <bing /> <!-- Make an annoying sound when the simulation finishes -->
+  <globals>
+    <![CDATA[
+    const double pi = M_PI;
+    double agamma = pi; 		/* excited state coherence decay (half the excited state linewidth, set to pi means all frequencies in terms of linewidth */
+
+    const double delta = 2*pi*40;  		/* one-photon detuning*/
+    //double od;		/*optical depth*/ 
+    double omega;		/*control field rabi frequency*/
+    double eta;   		/*operator for gradient*/
+    double t_switch; /* Time at which gradient reverses */
+
+    real gradientswitch(double time) {
+      if (time < t_switch) {
+        return 1.0; 
+      } else {
+        return -1.0;
+      }
+    }
+
+    double triangle( double x ) { 
+      if ((0 < x) && (x < 1)) {
+        return (1-x);
+      } else {
+        return 0.0;
+      }
+    }
+    ]]>
+  </globals>
+  <arguments append_args_to_output_filename="no">
+    <argument default_value= "5" name = "tswitch" type = "real" />
+    <argument default_value= "1" name = "bandwidth" type = "real" />
+    <argument default_value= "5" name = "omega_in" type = "real" />
+    <argument default_value= "400" name = "od" type = "real" />
+    <argument default_value= "3" name = "tin" type = "real" />
+    <argument default_value= "1.2" name = "pulsewidth" type = "real" />
+    <![CDATA[
+    omega = 2*pi*omega_in;
+    t_switch = tswitch;
+    ]]>
+  </arguments>
+</features>
+<geometry>
+  <propagation_dimension>t</propagation_dimension>
+    <transverse_dimensions>
+      <dimension domain="(-0.5, 0.5)" lattice="700" name="z" />
+    </transverse_dimensions>
+</geometry>
+
+<vector initial_space="z" name="spinwave" type="complex">
+  <components>S</components>
+</vector>
+
+<vector initial_space="z" name="probe" type="complex">
+  <components>E</components>
+</vector>
+
+<sequence>
+  <integrate algorithm="ARK45" interval="16" steps="200" tolerance="1.0e-6">
+  <samples>300</samples>
+  
+  <operators>   
+    <operator kind="functions">
+      <![CDATA[
+      eta = 2*pi*bandwidth * gradientswitch(t);
+      ]]>
+    </operator>
+             
+    <operator algorithm="RK4" kind="cross_propagation" propagation_dimension="z">
+      <integration_vectors> probe </integration_vectors>
+      <dependencies>spinwave</dependencies>
+      <boundary_condition kind="left">
+        <![CDATA[
+        E= triangle((t-tin)/pulsewidth);
+        ]]>
+      </boundary_condition>
+        <![CDATA[
+        dE_dz = i * sqrt(od) * omega * S / delta;
+        ]]>
+    </operator>
+
+    <integration_vectors>spinwave</integration_vectors>
+      <![CDATA[
+      dS_dt = i * (eta * z * S + sqrt(od) * agamma * omega * E / delta);
+      ]]>
+  </operators>
+  </integrate>
+</sequence>
+
+<output filename="triangle" format="hdf5">
+  <group>
+  <sampling basis="z" initial_sample="yes">
+    <moments>SR SI ER EI</moments> <!-- Desired output variables-->
+    <dependencies>probe spinwave</dependencies>
+    <![CDATA[
+    _SAMPLE_COMPLEX(S);
+    _SAMPLE_COMPLEX(E);
+    ]]>
+  </sampling>
+  </group>
+</output>
+</simulation>

@@ -1,8 +1,8 @@
-simulate="jesse-double-gaussian"
+simulate="double-gaussian"
 
 [arguments]
-pulsewidth=[0.5, 1.0, 1.2, 1.4]
+pulsewidth=[0.5, 1.5]
+pulsesep=[2,4]
 bandwidth=4
 tswitch=8
-
-# Other arguments will be set to default.
+tin=4

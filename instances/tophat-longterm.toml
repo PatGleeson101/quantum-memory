@@ -1,6 +1,0 @@
-simulate="jesse-tophat-long"
-
-[arguments]
-pulsewidth=2.0
-bandwidth=4
-tswitch=20

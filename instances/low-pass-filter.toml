@@ -1,0 +1,8 @@
+simulate="dithered-gaussian"
+
+[arguments]
+pulsewidth=2
+bandwidth=1
+tswitch=8
+ditherfreq=24
+ditheramp=0.3

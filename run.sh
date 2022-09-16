@@ -1,2 +1,2 @@
 #!/bin/sh
-python ./src/run.py "$1"
+python ./src/run.py "$@"

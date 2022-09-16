@@ -1,0 +1,7 @@
+simulate="squeeze-gaussian"
+
+[arguments]
+pulsewidth=2
+bandwidth=4
+tswitch=8
+dilation=[0.5, 2.0, 4.0]

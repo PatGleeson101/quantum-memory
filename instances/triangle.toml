@@ -1,8 +1,6 @@
-simulate="jesse-triangle"
+simulate="triangle"
 
 [arguments]
 pulsewidth=2
-bandwidth=4
+bandwidth=[4,8]
 tswitch=8
-
-# Other arguments will be set to default.

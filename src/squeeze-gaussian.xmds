@@ -1,9 +1,11 @@
 <simulation xmds-version="2">
-  <name>jesse-double-gaussian</name>
+  <name>squeeze-gaussian</name> <!-- name of compiled executable-->
   <author>Patrick Gleeson</author>
-  <description> 1-dimensional 2-level gradient echo memory simulation. Solves the 2-level Maxwell-Bloch equations (as written by Jesse) for an ensemble under a (linear) classical control field and a weak probe. This file implements a double Gaussian input pulse.
+  <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
-  Originally written by Jesse.
+  This file: gaussian input pulse, with linear control field. The field is 
+  inverted after tswitch, but with a different gradient; this dilates the 
+  output pulse.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->
@@ -19,11 +21,11 @@
     double eta;   		/*operator for gradient*/
     double t_switch; /* Time at which gradient reverses */
 
-    real gradientswitch(double time) {
+    real gradientswitch(double time, double dilate) {
       if (time < t_switch) {
         return 1.0; 
       } else {
-        return -1.0;
+        return -dilate;
       }
     }
 
@@ -39,7 +41,7 @@
     <argument default_value= "400" name = "od" type = "real" />
     <argument default_value= "3" name = "tin" type = "real" />
     <argument default_value= "1.2" name = "pulsewidth" type = "real" />
-    <argument default_value= "3" name = "pulsesep" type = "real" />
+    <argument default_value= "0.5" name = "dilation" type = "real" />
     <![CDATA[
     omega = 2*pi*omega_in;
     t_switch = tswitch;
@@ -49,7 +51,7 @@
 <geometry>
   <propagation_dimension>t</propagation_dimension>
     <transverse_dimensions>
-      <dimension domain="(-0.5, 0.5)" lattice="1000" name="z" />
+      <dimension domain="(-0.5, 0.5)" lattice="700" name="z" />
     </transverse_dimensions>
 </geometry>
 
@@ -68,7 +70,7 @@
   <operators>   
     <operator kind="functions">
       <![CDATA[
-      eta = 2*pi*bandwidth * gradientswitch(t);
+      eta = 2*pi*bandwidth * gradientswitch(t,dilation);
       ]]>
     </operator>
              
@@ -77,7 +79,7 @@
       <dependencies>spinwave</dependencies>
       <boundary_condition kind="left">
         <![CDATA[
-        E= gaussian(t-tin+pulsesep/2,pulsewidth) + gaussian(t-tin-pulsesep/2,pulsewidth);
+        E= gaussian(t-tin,pulsewidth);
         ]]>
       </boundary_condition>
         <![CDATA[
@@ -93,7 +95,7 @@
   </integrate>
 </sequence>
 
-<output filename="jesse-double-gaussian" format="hdf5">
+<output filename="squeeze-gaussian" format="hdf5">
   <group>
   <sampling basis="z" initial_sample="yes">
     <moments>SR SI ER EI</moments> <!-- Desired output variables-->

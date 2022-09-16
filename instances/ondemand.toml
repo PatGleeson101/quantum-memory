@@ -1,0 +1,7 @@
+simulate="tophat-ondemand"
+
+[arguments]
+pulsewidth=2.0
+bandwidth=4
+toff=8
+trelease=[15, 30]

@@ -1,9 +1,12 @@
 <simulation xmds-version="2">
-  <name>jesse-gaussian</name>
+  <name>tophat</name> <!-- name of compiled executable -->
   <author>Patrick Gleeson</author>
-  <description> 1-dimensional 2-level gradient echo memory simulation. Solves the 2-level Maxwell-Bloch equations (as written by Jesse) for an ensemble under a (linear) classical control field and a weak probe. This file implements a double Gaussian input pulse.
+  <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
-  Originally written by Jesse.
+  This file: tophat input pulse, with a linear control field that reverses
+  after tswitch. A large integration interval has been set (150) so that
+  the effect of switch delay on fidelity can be investigated. The number
+  of time samples has been increased accordingly.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->
@@ -27,8 +30,12 @@
       }
     }
 
-    double gaussian( double x, double w ) { 
-      return exp( -2 * pow(x,2) / pow(w,2) );
+    double tophat( double x, double a ) { 
+      if (abs(x) <= a) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
     }
     ]]>
   </globals>
@@ -48,7 +55,7 @@
 <geometry>
   <propagation_dimension>t</propagation_dimension>
     <transverse_dimensions>
-      <dimension domain="(-0.5, 0.5)" lattice="1000" name="z" />
+      <dimension domain="(-0.5, 0.5)" lattice="700" name="z" />
     </transverse_dimensions>
 </geometry>
 
@@ -61,8 +68,8 @@
 </vector>
 
 <sequence>
-  <integrate algorithm="ARK45" interval="16" steps="700" tolerance="1.0e-6">
-  <samples>300</samples>
+  <integrate algorithm="ARK45" interval="150" steps="200" tolerance="1.0e-6">
+  <samples>1200</samples>
   
   <operators>   
     <operator kind="functions">
@@ -76,7 +83,7 @@
       <dependencies>spinwave</dependencies>
       <boundary_condition kind="left">
         <![CDATA[
-        E= gaussian(t-tin,pulsewidth);
+        E= tophat(t-tin,pulsewidth/2);
         ]]>
       </boundary_condition>
         <![CDATA[
@@ -92,7 +99,7 @@
   </integrate>
 </sequence>
 
-<output filename="jesse-gaussian" format="hdf5">
+<output filename="tophat" format="hdf5">
   <group>
   <sampling basis="z" initial_sample="yes">
     <moments>SR SI ER EI</moments> <!-- Desired output variables-->

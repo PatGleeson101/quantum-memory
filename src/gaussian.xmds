@@ -1,8 +1,10 @@
 <simulation xmds-version="2">
-  <name>jesse-triangle</name>
+  <name>gaussian</name> <!-- name of compiled executable-->
   <author>Patrick Gleeson</author>
-  <description> 1-dimensional 2-level gradient echo memory simulation. Solves the 2-level Maxwell-Bloch equations (as written by Jesse) for an ensemble under a (linear) classical control field and a weak probe. This file implements a double Gaussian input pulse.
+  <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
+  This file: gaussian input pulse, with linear control field that reverses
+  after tswitch.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->
@@ -26,12 +28,8 @@
       }
     }
 
-    double triangle( double x ) { 
-      if ((0 < x) && (x < 1)) {
-        return (1-x);
-      } else {
-        return 0.0;
-      }
+    double gaussian( double x, double w ) { 
+      return exp( -2 * pow(x,2) / pow(w,2) );
     }
     ]]>
   </globals>
@@ -51,7 +49,7 @@
 <geometry>
   <propagation_dimension>t</propagation_dimension>
     <transverse_dimensions>
-      <dimension domain="(-0.5, 0.5)" lattice="1000" name="z" />
+      <dimension domain="(-0.5, 0.5)" lattice="700" name="z" />
     </transverse_dimensions>
 </geometry>
 
@@ -64,7 +62,7 @@
 </vector>
 
 <sequence>
-  <integrate algorithm="ARK45" interval="16" steps="700" tolerance="1.0e-6">
+  <integrate algorithm="ARK45" interval="16" steps="200" tolerance="1.0e-6">
   <samples>300</samples>
   
   <operators>   
@@ -79,7 +77,7 @@
       <dependencies>spinwave</dependencies>
       <boundary_condition kind="left">
         <![CDATA[
-        E= triangle((t-tin)/pulsewidth);
+        E= gaussian(t-tin,pulsewidth);
         ]]>
       </boundary_condition>
         <![CDATA[
@@ -95,7 +93,7 @@
   </integrate>
 </sequence>
 
-<output filename="jesse-triangle" format="hdf5">
+<output filename="gaussian" format="hdf5">
   <group>
   <sampling basis="z" initial_sample="yes">
     <moments>SR SI ER EI</moments> <!-- Desired output variables-->

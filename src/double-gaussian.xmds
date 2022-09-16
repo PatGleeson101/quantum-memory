@@ -1,7 +1,10 @@
 <simulation xmds-version="2">
-  <name>jesse-tophat</name>
+  <name>double-gaussian</name> <!-- name of compiled executable-->
   <author>Patrick Gleeson</author>
-  <description> 1-dimensional 2-level gradient echo memory simulation. Solves the 2-level Maxwell-Bloch equations (as written by Jesse) for an ensemble under a (linear) classical control field and a weak probe. This file implements a tophat pulse.
+  <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
+
+  This file: double-Gaussian input pulse, in a linear control field which
+  reverses after tswitch.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->
@@ -25,12 +28,8 @@
       }
     }
 
-    double tophat( double x, double a ) { 
-      if (abs(x) <= a) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
+    double gaussian( double x, double w ) { 
+      return exp( -2 * pow(x,2) / pow(w,2) );
     }
     ]]>
   </globals>
@@ -41,6 +40,7 @@
     <argument default_value= "400" name = "od" type = "real" />
     <argument default_value= "3" name = "tin" type = "real" />
     <argument default_value= "1.2" name = "pulsewidth" type = "real" />
+    <argument default_value= "3" name = "pulsesep" type = "real" />
     <![CDATA[
     omega = 2*pi*omega_in;
     t_switch = tswitch;
@@ -50,7 +50,7 @@
 <geometry>
   <propagation_dimension>t</propagation_dimension>
     <transverse_dimensions>
-      <dimension domain="(-0.5, 0.5)" lattice="1000" name="z" />
+      <dimension domain="(-0.5, 0.5)" lattice="700" name="z" />
     </transverse_dimensions>
 </geometry>
 
@@ -78,7 +78,7 @@
       <dependencies>spinwave</dependencies>
       <boundary_condition kind="left">
         <![CDATA[
-        E= tophat(t-tin,pulsewidth/2);
+        E= gaussian(t-tin+pulsesep/2,pulsewidth) + gaussian(t-tin-pulsesep/2,pulsewidth);
         ]]>
       </boundary_condition>
         <![CDATA[
@@ -94,7 +94,7 @@
   </integrate>
 </sequence>
 
-<output filename="jesse-tophat" format="hdf5">
+<output filename="double-gaussian" format="hdf5">
   <group>
   <sampling basis="z" initial_sample="yes">
     <moments>SR SI ER EI</moments> <!-- Desired output variables-->

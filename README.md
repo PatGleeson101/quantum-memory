@@ -3,9 +3,10 @@ This repo includes [XMDS2](http://www.xmds.org) source code and simulation insta
 
 Different schemes and phenomena are visualised and benchmarked in the included Jupyter notebook (python).
 
-XMDS2 source files are based on the original `1DGEM2L.xmds` file by Jesse.
+XMDS2 source files are based on the original `1DGEM2L.xmds` file. You can see the group's repository here: [https://github.com/lemni1/Quantum-Memory-Simulations].
 
 ## License
+To be confirmed.
 
 ## Usage
 > See [Convenient Flags](#Convenient-flags) for how to autocompile and/or run all simulations at once.

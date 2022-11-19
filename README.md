@@ -1,12 +1,12 @@
 # 1D Optical Gradient Echo Memory exploration with XMDS2
 This repo includes [XMDS2](http://www.xmds.org) source code and simulation instances for numerical exploration of optical Gradient Echo Memory (GEM) in a room-temperature gas cloud. These make use of a custom helper tool for managing multiple XMDS2 simulations and different combinations of parameters.
 
-Different schemes and phenomena are visualised and benchmarked in the included Jupyter notebook (python).
+Different schemes and phenomena are visualised in the included Jupyter notebook (python).
 
 XMDS2 source files are based on the original `1DGEM2L.xmds` file. You can see the group's repository here: [https://github.com/lemni1/Quantum-Memory-Simulations].
 
 ## License
-To be confirmed.
+[MIT](LICENCE)
 
 ## Usage
 > See [Convenient Flags](#Convenient-flags) for how to autocompile and/or run all simulations at once.
@@ -49,7 +49,7 @@ root-dir: ./run.sh ./instances/ -a
 Using `-c` with `-a` will run all instances, (re)compiling all necessary simulations.
 
 ## Installing XMDS2 on a Mac
-The XMDS Homebrew formula (described [here](http://www.xmds.org/installation.html#mac-os-x-installation)) does not work on my machine as of 2022. Instead, I successfully followed the [manual install instructions](http://www.xmds.org/installation.html#manual-installation-from-source). Below is a brief overview, which may need to be adjusted for different machines and is described more thoroughly in the instructions.
+The XMDS Homebrew formula (described [here](http://www.xmds.org/installation.html#mac-os-x-installation)) **does not work** on my machine as of 2022. Instead, I successfully followed the [manual install instructions](http://www.xmds.org/installation.html#manual-installation-from-source). Below is a brief overview, which may need to be adjusted for different machines and is described more thoroughly in the instructions.
 
 Ensure you have Python 3 and a C++ compiler. The compiler `clang` can be obtained (amongst other things) by installing the XCode developer tools:
 ```
@@ -63,8 +63,7 @@ brew install gsl (optional)
 cd ~/.xmds-3.1.0
 sudo ./setup.py develop
 ```
-
-I am then able to run `xmds2 --help` in terminal.
+You will likely need to add `~/.xmds-3.1.0/bin/` to your `PATH` and give the contained files execute permission using `chmod`. I am then able to run `xmds2 --help` in terminal.
 
 ## Notes
 The two advantages of storing the XMDS-generated C and binary files in a separate `bin/` directory are:

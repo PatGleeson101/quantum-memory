@@ -3,10 +3,12 @@
   <author>Patrick Gleeson</author>
   <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
-  This file: tophat input pulse, with a linear control field that reverses
+  This file: tophat input pulse, with a linear detuning field that reverses
   after tswitch. A large integration interval has been set (150) so that
   the effect of switch delay on fidelity can be investigated. The number
   of time samples has been increased accordingly.
+
+  EDIT: the simulation is so idealised that investigating fidelity is moot.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->

@@ -1,11 +1,9 @@
 <simulation xmds-version="2">
-  <name>squeeze-gaussian</name> <!-- name of compiled executable-->
+  <name>uneven-double-gaussian</name> <!-- name of compiled executable-->
   <author>Patrick Gleeson</author>
   <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
-  This file: gaussian input pulse, with a linear detuning. The detuning is 
-  inverted after tswitch, but with a different gradient; this dilates the 
-  output pulse.
+  This file: asymmetric double-Gaussian input pulse, in a linear detuning field which reverses after tswitch.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->
@@ -21,11 +19,11 @@
     double eta;   		/*operator for gradient*/
     double t_switch; /* Time at which gradient reverses */
 
-    real gradientswitch(double time, double dilate) {
+    real gradientswitch(double time) {
       if (time < t_switch) {
         return 1.0; 
       } else {
-        return -dilate;
+        return -1.0;
       }
     }
 
@@ -41,7 +39,7 @@
     <argument default_value= "400" name = "od" type = "real" />
     <argument default_value= "3" name = "tin" type = "real" />
     <argument default_value= "1.2" name = "pulsewidth" type = "real" />
-    <argument default_value= "0.5" name = "dilation" type = "real" />
+    <argument default_value= "3" name = "pulsesep" type = "real" />
     <![CDATA[
     omega = 2*pi*omega_in;
     t_switch = tswitch;
@@ -70,7 +68,7 @@
   <operators>   
     <operator kind="functions">
       <![CDATA[
-      eta = 2*pi*bandwidth * gradientswitch(t,dilation);
+      eta = 2*pi*bandwidth * gradientswitch(t);
       ]]>
     </operator>
              
@@ -79,7 +77,7 @@
       <dependencies>spinwave</dependencies>
       <boundary_condition kind="left">
         <![CDATA[
-        E= gaussian(t-tin,pulsewidth);
+        E= gaussian(t-tin+pulsesep/2,pulsewidth) + 2*gaussian(t-tin-pulsesep/2,pulsewidth);
         ]]>
       </boundary_condition>
         <![CDATA[
@@ -95,7 +93,7 @@
   </integrate>
 </sequence>
 
-<output filename="squeeze-gaussian" format="hdf5">
+<output filename="uneven-double-gaussian" format="hdf5">
   <group>
   <sampling basis="z" initial_sample="yes">
     <moments>SR SI ER EI</moments> <!-- Desired output variables-->

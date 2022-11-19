@@ -4,5 +4,5 @@ simulate="dithered-gaussian"
 pulsewidth=2
 bandwidth=1
 tswitch=8
-ditherfreq=24
+ditherfreq=12
 ditheramp=0.3

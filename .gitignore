@@ -4,3 +4,8 @@
 
 instances/*/
 bin/
+figures/
+ppt-figures/
+
+rough-exploration.ipynb
+presentation-figures.ipynb

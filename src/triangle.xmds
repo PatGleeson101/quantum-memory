@@ -3,7 +3,7 @@
   <author>Patrick Gleeson</author>
   <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
-  This file: asymetric triangle input pulse, with a linear control field that reverses after tswitch.
+  This file: asymmetric triangle input pulse, with a linear detuning that reverses after tswitch.
   </description>
 <features>
   <benchmark /> <!-- Each simulation will report its runtime -->

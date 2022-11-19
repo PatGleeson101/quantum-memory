@@ -1,0 +1,142 @@
+<simulation xmds-version="2">
+  <name>pulse-sequencing</name> <!-- name of compiled executable-->
+  <author>Patrick Gleeson</author>
+  <description>1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
+
+  This file: recreates a modified Figure 3 from doi:10.1038/nature08325 (pulse sequencing and stretching). Five input Gaussian pulses are manipulated by varying the control field power and linear detuning gradient.
+  </description>
+<features>
+  <benchmark /> <!-- Each simulation will report its runtime -->
+  <bing /> <!-- Make an annoying sound when the simulation finishes -->
+  <globals>
+    <![CDATA[
+    const double pi = M_PI;
+    double agamma = pi; 		/* excited state coherence decay (half the excited state linewidth, set to pi means all frequencies in terms of linewidth */
+
+    const double pulsewidth = 1.2; /*Width of each Gaussian */
+    const double bandwidth = 2;
+    const double od = 500;
+
+    const double DELTA = 2*pi*40;  		/* one-photon detuning*/
+    const double omega0 = 2*pi*4;     /*initial control field rabi frequency*/
+    const double eta0 = 2*pi*bandwidth;      /* initial detuning gradient */
+
+    double omega; /* Time-dependent control field Rabi frequency */
+
+    /* Pulse spacing and shape */
+    const double pulsesep = pulsewidth * 6;
+
+    double gaussian( double x, double w ) { 
+      return exp( -2 * pow(x,2) / pow(w,2) );
+    }
+
+    /* Hold and release times */
+    const double absorb_time = 6 * pulsesep;
+    const double initial_hold = 4 * pulsesep;
+    ]]>
+  </globals>
+</features>
+<geometry>
+  <propagation_dimension>t</propagation_dimension>
+    <transverse_dimensions>
+      <dimension domain="(-0.5, 0.5)" lattice="700" name="z" />
+    </transverse_dimensions>
+</geometry>
+
+<vector initial_space="z" name="spinwave" type="complex">
+  <components>S</components>
+</vector>
+
+<vector initial_space="z" name="probe" type="complex">
+  <components>E</components>
+</vector>
+
+<!-- Define the detuning schedule -->
+<computed_vector name="twoPhotonDetuning" type="real">
+  <components> delta2 </components>
+  <evaluation>
+    <![CDATA[
+    if (t < absorb_time) {
+      delta2= eta0*z;
+    } else if (t < absorb_time + initial_hold){
+      delta2 = 0;
+    } else if (t < absorb_time + initial_hold + 1.5*absorb_time) {
+      delta2 = -eta0*z;
+    } else if (t < absorb_time + initial_hold + 3*absorb_time) {
+      delta2 = eta0*z;
+    } else if (t < initial_hold + 5.5*absorb_time) {
+      delta2 = -eta0*z;
+    } else if (t < initial_hold + 6*absorb_time) {
+      delta2 = 2*eta0*z;
+    } else { /* Final gradient */
+      delta2 = -0.5*eta0*z;
+    }
+    ]]>
+  </evaluation>
+</computed_vector>
+
+<sequence>
+  <integrate algorithm="ARK45" interval="350" steps="200" tolerance="1.0e-6">
+  <samples>2000</samples>
+  
+  <operators>
+    <!-- Define the control-field schedule -->
+    <operator kind="functions">
+      <![CDATA[
+        if (t < absorb_time) {
+          omega = omega0;
+        } else if (t < absorb_time + initial_hold + 2.5*pulsesep) {
+          omega = 0;
+        } else if (t < absorb_time + initial_hold + 4.5*pulsesep) {
+          omega = omega0;
+        } else if (t < 3*absorb_time + initial_hold + 3*pulsesep) {
+          omega = 0;
+        } else if (t < 3*absorb_time + initial_hold + 6*pulsesep) {
+          omega = omega0;
+        } else if (t < 5*absorb_time + initial_hold) {
+          omega = 0;
+        } else if (t < 6*absorb_time + initial_hold) {
+          omega = 0.5*omega0;
+        } else { /* Catch-all */
+          omega = omega0;
+        }
+      ]]>
+    </operator>
+    <operator algorithm="RK4" kind="cross_propagation" propagation_dimension="z">
+      <integration_vectors> probe </integration_vectors>
+      <dependencies>spinwave</dependencies>
+      <boundary_condition kind="left">
+        <![CDATA[
+        E = 0;
+        for (int i = 1; i <= 5; i++) {
+          E += (4.5-i*0.5) * gaussian(t - i*pulsesep, pulsewidth);
+        }
+        ]]>
+      </boundary_condition>
+        <![CDATA[
+        dE_dz = i * sqrt(od) * omega * S / DELTA;
+        ]]>
+    </operator>
+
+    <integration_vectors>spinwave</integration_vectors>
+    <dependencies>twoPhotonDetuning</dependencies>
+      <![CDATA[
+      dS_dt = i * (delta2 * S + sqrt(od) * agamma * omega * E / DELTA);
+      ]]>
+  </operators>
+  </integrate>
+</sequence>
+
+<output filename="pulse-sequencing" format="hdf5">
+  <group>
+  <sampling basis="z" initial_sample="yes">
+    <moments>SR SI ER EI</moments> <!-- Desired output variables-->
+    <dependencies>probe spinwave</dependencies>
+    <![CDATA[
+    _SAMPLE_COMPLEX(S);
+    _SAMPLE_COMPLEX(E);
+    ]]>
+  </sampling>
+  </group>
+</output>
+</simulation>

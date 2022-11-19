@@ -1,0 +1,7 @@
+simulate="nonlinear-recall"
+
+[arguments]
+pulsewidth=2
+bandwidth=4
+tswitch=8
+od=700

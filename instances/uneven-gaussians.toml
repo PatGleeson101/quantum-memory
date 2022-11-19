@@ -1,0 +1,8 @@
+simulate="uneven-double-gaussian"
+
+[arguments]
+pulsewidth=0.5
+pulsesep=2
+bandwidth=4
+tswitch=8
+tin=4

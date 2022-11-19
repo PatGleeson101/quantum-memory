@@ -3,8 +3,8 @@
   <author>Patrick Gleeson</author>
   <description> 1-dimensional 2-level gradient echo memory simulation which solves the 2-level Maxwell-Bloch equations in the strong-control weak-probe field regime (original code by Jesse).
 
-  This file: tophat input pulse with a linear control field. The control field
-  turns off at toff and is re-activated (but inverted) at trelease. A large integration interval and number of time samples have been set, to allow
+  This file: tophat input pulse with a linear ensemble detuning. The control 
+  field turns off at toff and is re-activated (but inverted) at trelease. A large integration interval and number of time samples have been set, to allow
   investigating decay over time.
   </description>
 <features>

@@ -63,7 +63,7 @@ brew install gsl (optional)
 cd ~/.xmds-3.1.0
 sudo ./setup.py develop
 ```
-You will likely need to add `~/.xmds-3.1.0/bin/` to your `PATH` and give the contained files execute permission using `chmod`. I am then able to run `xmds2 --help` in terminal.
+You will likely need to add `~/.xmds-3.1.0/bin/` to your `PATH` and give the contained files execute permission using `chmod`. On an Intel Mac, I am then able to run `xmds2 --help` in terminal. On Apple Silicon however, Homebrew uses a different default install directory which (as of 2022) will not be automatically found by XMDS2. The [manual install instructions](http://www.xmds.org/installation.html#manual-installation-from-source) contain steps for explicitly specifying the locations of missing libraries (e.g. FFTW).
 
 ## Notes
 The two advantages of storing the XMDS-generated C and binary files in a separate `bin/` directory are:
